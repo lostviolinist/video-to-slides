@@ -26,7 +26,7 @@ from .source import (
     youtube_video_id,
 )
 from .timeline import make_windows
-from .transcribe import DEEP_MODEL, TURBO_MODEL, transcribe_file, transcribe_sample
+from .transcribe import DEEP_MODEL, TURBO_MODEL, model_is_cached, transcribe_file, transcribe_sample
 
 
 def _relative(project: Path, path: Path | str | None) -> str | None:
@@ -105,9 +105,14 @@ def prepare_project(
     purpose: str = "briefing",
     slides: str = "auto",
     output_language: str = "auto",
+    transcription: str = "auto",
     keep_media: bool = False,
     allow_model_download: bool = False,
 ) -> dict[str, Any]:
+    if transcription not in {"auto", "captions", "local"}:
+        raise ValueError(f"Unsupported transcription mode: {transcription}")
+    if accuracy == "deep" and transcription == "captions":
+        raise ValueError("Deep accuracy requires local transcription; use --transcription local or adaptive accuracy")
     project = project.resolve()
     project.mkdir(parents=True, exist_ok=True)
     source_kind, local_path = classify_source(source_value)
@@ -165,23 +170,62 @@ def prepare_project(
 
     audit = audit_captions(caption_segments, duration)
     spot_checks: list[dict[str, Any]] = []
-    full_asr = source_kind.startswith("local") or accuracy == "deep" or not caption_segments
+    spot_check_status = "not-requested"
+    full_asr = (
+        transcription == "local"
+        or source_kind.startswith("local")
+        or accuracy == "deep"
+        or not caption_segments
+    )
     full_asr_reasons: list[str] = []
     if full_asr:
         full_asr_reasons.append("local source, deep mode, or captions unavailable")
 
-    if source_kind == "youtube" and accuracy in {"adaptive", "deep"}:
-        audio_candidates = sorted(media_dir.glob("audio.*"))
-        audio_path = audio_candidates[0] if audio_candidates else download_audio(source_value, media_dir)
-    if accuracy == "adaptive" and caption_segments and audio_path:
-        spot_checks = _spot_checks(audio_path, caption_segments, duration, allow_model_download)
-        average_similarity = sum(check["similarity"] for check in spot_checks) / max(1, len(spot_checks))
-        if audit["recommended_full_asr"]:
-            full_asr = True
-            full_asr_reasons.extend(audit["reasons"])
-        if average_similarity < 0.62:
-            full_asr = True
-            full_asr_reasons.append("distributed audio checks materially disagree with captions")
+    if transcription == "captions":
+        if not caption_segments:
+            raise RuntimeError(
+                "Captions-only mode was requested, but the source has no usable captions. "
+                "Provide a captioned YouTube source or use --transcription local."
+            )
+        full_asr = False
+        full_asr_reasons = []
+        spot_check_status = "disabled-by-captions-mode"
+
+    if source_kind == "youtube" and transcription != "captions":
+        selected_model = DEEP_MODEL if accuracy == "deep" else TURBO_MODEL
+        local_asr_ready = allow_model_download or model_is_cached(selected_model)
+        if full_asr and not local_asr_ready:
+            raise PermissionError(
+                f"Transcription is required, but {selected_model} is not cached. "
+                "Approve the local model download with --allow-model-download, or use a captioned source "
+                "with --transcription captions."
+            )
+        needs_audio = full_asr or (
+            accuracy == "adaptive" and bool(caption_segments) and local_asr_ready
+        )
+        if needs_audio:
+            audio_candidates = sorted(media_dir.glob("audio.*"))
+            audio_path = audio_candidates[0] if audio_candidates else download_audio(source_value, media_dir)
+
+        if accuracy == "adaptive" and caption_segments:
+            if local_asr_ready and audio_path:
+                spot_checks = _spot_checks(audio_path, caption_segments, duration, allow_model_download)
+                spot_check_status = "completed"
+                average_similarity = sum(check["similarity"] for check in spot_checks) / max(1, len(spot_checks))
+                if audit["recommended_full_asr"]:
+                    full_asr = True
+                    full_asr_reasons.extend(audit["reasons"])
+                if average_similarity < 0.62:
+                    full_asr = True
+                    full_asr_reasons.append("distributed audio checks materially disagree with captions")
+            elif audit["recommended_full_asr"]:
+                raise PermissionError(
+                    "Caption quality is insufficient for a reliable model-free run. "
+                    "Approve local Whisper with --allow-model-download, force the lower-confidence captions with "
+                    "--transcription captions, or provide a better transcript."
+                )
+            else:
+                spot_check_status = "skipped-no-local-model"
     if accuracy == "fast" and caption_segments:
         full_asr = False
 
@@ -217,6 +261,7 @@ def prepare_project(
         "caption_language": caption_language,
         "structural": audit,
         "spot_checks": spot_checks,
+        "spot_check_status": spot_check_status,
         "full_asr_used": bool(asr_segments),
         "full_asr_reasons": sorted(set(full_asr_reasons)),
         "selected_transcript_source": transcript_source,
@@ -238,6 +283,7 @@ def prepare_project(
         "accuracy": accuracy,
         "purpose": purpose,
         "slides": slides,
+        "transcription": transcription,
         "keep_media": keep_media,
         "scout_path": _relative(project, scout_path),
         "audio_path": _relative(project, audio_path),

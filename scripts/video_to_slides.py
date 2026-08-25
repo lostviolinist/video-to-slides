@@ -29,6 +29,12 @@ def build_parser() -> argparse.ArgumentParser:
     prepare.add_argument("--purpose", choices=["briefing", "study", "action"], default="briefing")
     prepare.add_argument("--slides", default="auto")
     prepare.add_argument("--output-language", default="auto")
+    prepare.add_argument(
+        "--transcription",
+        choices=["auto", "captions", "local"],
+        default="auto",
+        help="Use usable captions without a model when possible, require captions, or force local MLX Whisper",
+    )
     prepare.add_argument("--keep-media", action="store_true")
     prepare.add_argument("--allow-model-download", action="store_true")
 
@@ -65,6 +71,7 @@ def main() -> int:
             purpose=args.purpose,
             slides=args.slides,
             output_language=args.output_language,
+            transcription=args.transcription,
             keep_media=args.keep_media,
             allow_model_download=args.allow_model_download,
         )

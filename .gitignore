@@ -9,10 +9,10 @@ build/
 outputs/
 work/
 *.pptx
+!examples/**/*.pptx
 *.mp4
 *.mkv
 *.webm
 *.mov
 *.wav
 *.mp3
-

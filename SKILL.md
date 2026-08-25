@@ -17,6 +17,7 @@ Parse these optional controls from the request:
 - `--purpose briefing|study|action` (default `briefing`)
 - `--slides auto|N` (default `auto`)
 - `--output-language CODE` (default source language)
+- `--transcription auto|captions|local` (default `auto`)
 - `--review-outline`
 - `--design auto|paper|native` (default `auto`)
 - `--design-mode auto|source-native|editorial-remix|independent` (default `auto`)
@@ -42,9 +43,10 @@ If a new presentation's audience or purpose is not stated, use the defaults abov
 ## Accuracy Rules
 
 - Prefer complete manual captions, but do not assume captions are accurate.
-- In `adaptive`, audit caption coverage and compare three distributed audio samples. Run full MLX Whisper transcription when captions are absent, incomplete, noisy, or materially disagree.
+- In `adaptive`, audit caption coverage structurally. When the local Whisper model is already cached or its download was approved, compare three distributed audio samples; otherwise continue model-free when captions are structurally sound and record that ASR spot checks were skipped.
 - In `deep`, always transcribe the complete audio and compare it with captions.
 - In `fast`, use available captions and sparse visual sampling; if no transcript exists, transcription remains necessary.
+- `--transcription captions` guarantees a no-model run and accepts the source captions with explicit uncertainty; stop clearly when captions are unavailable. `--transcription local` forces MLX Whisper. `auto` prefers usable captions and only requires the local model when reliable caption evidence is unavailable.
 - Before a first transcription model download, report the model and purpose and obtain approval. Pass `--allow-model-download` only after approval.
 - Treat chapters as hints, not importance labels. Analyze the complete duration in bounded windows so long videos are not biased toward the opening.
 - Prefer frames showing diagrams, charts, equations, code, UI states, demonstrations, examples, or consequential on-screen text. Reject blurry transitions, duplicate slides, generic B-roll, and non-substantive sponsor material.
@@ -53,4 +55,4 @@ If a new presentation's audience or purpose is not stated, use the defaults abov
 
 ## Failures
 
-For a restricted YouTube source, ask for a local file or explicit authorization before accessing browser cookies. If speech is sparse, switch to a visual-storyboard analysis and lower confidence. If `--design paper` was explicit and Paper is unavailable, stop at the design phase and report the exact connection failure; in `auto`, use the native source-aware fallback and disclose it. If setup, acquisition, transcription, design handoff, or validation fails, read [references/troubleshooting.md](references/troubleshooting.md), preserve the project for diagnosis, and report the exact blocking phase.
+For a restricted YouTube source, ask for a local file or explicit authorization before accessing browser cookies. If speech is sparse, switch to a visual-storyboard analysis and lower confidence. If captions are unavailable and the user declines local transcription, request a captioned source or transcript rather than pretending visual analysis captured the spoken content. If `--design paper` was explicit and Paper is unavailable, stop at the design phase and report the exact connection failure; in `auto`, use the native source-aware fallback and disclose it. If setup, acquisition, transcription, design handoff, or validation fails, read [references/troubleshooting.md](references/troubleshooting.md), preserve the project for diagnosis, and report the exact blocking phase.

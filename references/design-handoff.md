@@ -21,6 +21,8 @@ Choose `source-native` when the source has a distinctive and reusable visual sys
 
 ## Paper route
 
+Paper is optional. It is a connected design canvas used to audition art direction before the chosen system is reconstructed as editable PowerPoint objects; it is not the deck renderer or an installation requirement.
+
 When Paper MCP is connected:
 
 1. Read Paper's full `paper-mcp-instructions` guide before other Paper operations.
@@ -38,7 +40,7 @@ If `--review-design` is active, pause after the three-slide audition. Otherwise 
 
 ## Native fallback
 
-When Paper is unavailable in `auto`, create the same design brief and three-slide audition with the Presentations workflow. Preserve `visual_dna.json` and the same QA checks. Do not silently revert to a fixed dark consulting theme or a generic editorial template.
+When Paper is unavailable in `auto`, create the same design brief and three-slide audition with the Presentations workflow. Preserve `visual_dna.json` and the same QA checks. Do not silently revert to a fixed dark consulting theme or a generic editorial template. Mention the native fallback in the final handoff, but do not treat the missing optional MCP as an error.
 
 ## Design QA
 

@@ -6,6 +6,7 @@
 - Incompatible system Python: call `load_workspace_dependencies` and pass its Python executable as `VTS_PYTHON` when running setup.
 - Missing FFmpeg: rerun setup; `imageio-ffmpeg` supplies the skill-local executable.
 - Whisper model not cached: obtain approval, then repeat `prepare` with `--allow-model-download`.
+- User does not want local model weights: use `--transcription captions`. This works only when the YouTube source exposes usable captions; it is not a speech-recognition substitute for captionless media.
 - `No Metal device available`: the environment is installed, but transcription is sandboxed. Rerun the explicit `prepare` command with unsandboxed approval.
 
 ## YouTube acquisition
@@ -17,6 +18,7 @@
 ## Transcript quality
 
 - Large caption gaps, high repetition, implausible word rate, or poor distributed spot-check agreement trigger full ASR in adaptive mode.
+- In model-free `auto`, structurally sound captions are accepted and `spot_check_status` is recorded as `skipped-no-local-model`. Structurally unreliable captions stop with choices instead of silently producing a high-confidence deck.
 - Music, silence, or visual-only material triggers `visual-storyboard` analysis. Do not manufacture a spoken thesis.
 - Preserve raw captions and ASR results when sources disagree; record the disagreement as uncertainty.
 

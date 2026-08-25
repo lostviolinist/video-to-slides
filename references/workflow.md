@@ -8,7 +8,7 @@ Set `VTS_SKILL_DIR` to this skill's absolute directory. Run:
 "$VTS_SKILL_DIR/.venv/bin/python" "$VTS_SKILL_DIR/scripts/check_env.py"
 ```
 
-If the environment is missing, call `load_workspace_dependencies`, set `VTS_PYTHON` to its bundled Python executable, and run `bash "$VTS_SKILL_DIR/scripts/setup.sh"`; then repeat the check. Python 3.10+ is required. Setup installs a skill-local toolchain and does not download a Whisper model. The first operation that needs a model stops unless `--allow-model-download` is passed after user approval.
+If the environment is missing, call `load_workspace_dependencies`, set `VTS_PYTHON` to its bundled Python executable, and run `bash "$VTS_SKILL_DIR/scripts/setup.sh"`; then repeat the check. Python 3.10+ is required. Setup installs a skill-local toolchain and does not download Whisper weights. A captioned YouTube video can run without those weights; the first operation that genuinely needs local transcription stops unless `--allow-model-download` is passed after user approval.
 
 Create the project under a writable, conversation-specific work directory. Keep only final deliverables in the host output directory.
 
@@ -19,10 +19,18 @@ YouTube acquisition requires network access, and MLX transcription requires Appl
 ```bash
 "$VTS_SKILL_DIR/.venv/bin/python" "$VTS_SKILL_DIR/scripts/video_to_slides.py" prepare \
   "<source>" --project "<absolute-project-dir>" \
-  --accuracy adaptive --purpose briefing --slides auto
+  --accuracy adaptive --purpose briefing --slides auto --transcription auto
 ```
 
 Add `--output-language`, `--keep-media`, or `--allow-model-download` only when applicable. Preparation writes source metadata, raw and normalized transcripts, seven-minute timeline windows with 30-second overlap, candidate-frame metadata, and five-minute contact sheets.
+
+### Transcription modes
+
+- `auto` (default): use structurally sound YouTube captions without downloading a model. If the MLX model is already cached or approved, use it for distributed spot checks. Require transcription only when captions are absent or structurally unreliable.
+- `captions`: never use or download a local model. Continue with manual or automatic captions and preserve the caption audit so downstream evidence can reflect lower confidence. Stop when the source has no usable captions.
+- `local`: force full MLX Whisper transcription. `deep` accuracy also requires local transcription.
+
+There is no cloud transcription provider in this release. Captionless local files and captionless YouTube videos therefore need the approved local model or a separately supplied transcript.
 
 ## Analyze every window
 
