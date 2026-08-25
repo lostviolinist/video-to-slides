@@ -1,8 +1,8 @@
 # video-to-slides
 
-An evidence-first Codex skill that turns a YouTube video or local video/audio file into an editable PowerPoint briefing.
+Turn any YouTube video into a PowerPoint deck that you can flip through easily and quickly. The skill watches any video, identifies its most important points, and turns it into an informational PPT deck.
 
-Instead of relying on captions alone, the workflow combines timestamped speech, scene changes, visual novelty, important on-screen information, and whole-video topic coverage. It retains a reusable evidence pack so every substantive slide claim can be traced back to the source.
+I made this skill for myself because I want to learn from the many YouTube videos out there, but I don't have the attention span to listen for an hour straight!
 
 ## What it produces
 
@@ -73,4 +73,3 @@ bash tests/run_tests.sh
 ```
 
 The implementation is Mac-optimized and uses a packaged FFmpeg path, avoiding a Homebrew requirement.
-
