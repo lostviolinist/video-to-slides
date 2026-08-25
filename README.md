@@ -4,34 +4,34 @@ Turn any YouTube video into a PowerPoint deck that you can flip through easily a
 
 I made this skill for myself because I want to learn from the many YouTube videos out there, but I don't have the attention span to listen for an hour straight!
 
-## What it produces
+## What you get
 
 - An editable `.pptx` deck, normally 8–16 slides and never more than 20 automatically
-- Timestamped raw and normalized transcripts
-- Selected high-resolution source frames
-- Evidence cards and claim-to-source mappings
-- Slide briefs with `[Sources]` blocks for speaker notes
-- Optional source-aware art direction through Paper
+- A transcript with timestamps
+- The most useful screenshots from the video
+- Speaker notes showing where each slide came from
+- Extra files that let you check the deck against the video
+- Better-looking slides with Paper, if you want to use it
 
 ## Example output
 
-This sample comes from [3Blue1Brown's *Transformers, the tech behind LLMs*](https://youtu.be/wjZofJX0v4M), using adaptive accuracy and the optional Paper design route.
+Here is a sample made from [3Blue1Brown's *Transformers, the tech behind LLMs*](https://youtu.be/wjZofJX0v4M). I used Paper for the design.
 
 [Download the editable sample deck](examples/wjZofJX0v4M/transformers-paper-redesign.pptx)
 
 ![Montage of the 13-slide sample deck](examples/wjZofJX0v4M/preview.png)
 
-This is the expected shape of the result: a concise visual briefing, selective source frames, editable explanatory elements, and timestamped evidence in the speaker notes.
+This is roughly what you can expect. The words, colors, and layout will change to match each video.
 
 ## Install
 
-Clone the repository into your Codex skills directory:
+Open Terminal and paste this:
 
 ```bash
 git clone https://github.com/lostviolinist/video-to-slides.git ~/.codex/skills/video-to-slides
 ```
 
-Then restart Codex so it discovers the skill. Its Python environment and media-analysis dependencies can be prepared with:
+Then restart Codex. Paste this once to finish setting it up:
 
 ```bash
 bash ~/.codex/skills/video-to-slides/scripts/setup.sh
@@ -45,63 +45,63 @@ Ask Codex naturally:
 Turn this video into slides: https://youtu.be/VIDEO_ID
 ```
 
-Useful options include:
+You can also be more specific. For example:
 
 ```text
---accuracy adaptive|deep|fast
---purpose briefing|study|action
---slides auto|N
---output-language <code>
---transcription auto|captions|local
---review-outline
---design auto|paper|native
---design-mode auto|source-native|editorial-remix|independent
---review-design
---style <description>
---output <path>
---keep-media
+Show me the slide plan before you build it:
+Turn this video into slides: https://youtu.be/VIDEO_ID --review-outline
+
+Make it 10 slides:
+Turn this video into slides: https://youtu.be/VIDEO_ID --slides 10
+
+Use Paper for the design:
+Turn this video into slides: https://youtu.be/VIDEO_ID --design paper
 ```
 
-### Without a local Whisper model
+### Don't want to download the Whisper model?
 
-The default `--transcription auto` mode now uses structurally sound YouTube captions without downloading Whisper weights. If the model is already cached—or you explicitly approve its download—the skill can additionally run distributed speech-recognition checks.
+That is fine for most YouTube videos with captions. By default, the skill checks the captions and uses them without downloading the large Whisper model.
 
-Use `--transcription captions` to guarantee a model-free run. This works with manual or automatic YouTube captions; captionless videos and local media still require local transcription or a separately supplied transcript. `--transcription local` forces MLX Whisper, and `--accuracy deep` always requires it.
+Use `--transcription captions` if you never want it to use Whisper. If a video has no captions, the skill will stop and tell you instead of making slides from incomplete information.
 
-Setup installs the transcription software but not its large model weights.
+Videos with no captions and videos stored on your computer still need Whisper or a transcript you provide. If you want the skill to use Whisper, just say so in your request.
 
-## Paper design route (optional)
+The setup step adds a small helper for transcription, but it does not download the large Whisper model.
 
-Paper is an optional design canvas: the skill uses it to audition the deck's palette, typography, and layouts before rebuilding the chosen direction as editable PowerPoint elements.
+## Want better-looking slides? Paper is optional
 
-To connect Paper to Codex:
+Paper is a design app. The skill can use it to try out the colors, fonts, and layouts before making the editable PowerPoint.
 
-1. [Install Paper Desktop](https://paper.design/downloads), sign in, and open any Paper file. Opening a file starts Paper's local MCP server.
+Paper connects to Codex using something called MCP. You do not need to understand how it works—just set it up once:
+
+1. [Install Paper Desktop](https://paper.design/downloads), sign in, and open any Paper file.
 2. In Codex, open **Settings → MCP Servers**, add a **Streamable HTTP** server named `paper`, and use `http://127.0.0.1:29979/mcp` as the URL.
 3. Save, restart Codex, and verify the connection by asking: “Create a red rectangle in Paper.”
-4. Generate with `--design paper`, or leave the default `--design auto` so the skill uses Paper when connected and the native source-aware presentation workflow when it is not.
+4. Use `--design paper` when you make a deck.
 
-See [Paper's MCP documentation](https://paper.design/docs/mcp) for plugin installation and troubleshooting.
+If you do not install Paper, you do not need to change anything. The skill will still make the slides without it.
 
-## Design philosophy
+See [Paper's setup guide](https://paper.design/docs/mcp) if the connection is not working.
 
-The default workflow is source-aware rather than template-first. It extracts a video's visual DNA—palette, typography, composition, recurring graphic language, pacing, and image treatment—and uses that to select a coherent deck direction. When Paper is available, the skill creates and reviews a small design audition before reconstructing the chosen system as editable PowerPoint elements. Paper is never required: `--design auto` falls back to the same source-aware design brief and QA process natively.
+## How it chooses the look
 
-## Accuracy and source handling
+The skill looks at the video's colors, fonts, diagrams, screenshots, and overall feel. It uses those clues to make a deck that fits the video instead of using the same template every time.
 
-- Complete manual captions are preferred when reliable.
-- Adaptive mode audits caption coverage and runs distributed speech-recognition spot checks only when the local model is already present or approved.
-- Full transcription is used when captions are absent, incomplete, noisy, or materially inconsistent.
-- Long videos are processed hierarchically across the entire timeline, not just the opening.
-- Screenshots are retained only when they materially improve fidelity; charts and diagrams are recreated only when their values and relationships are supported.
-- Users are responsible for having permission to download, analyze, and reuse source media.
+## How it avoids missing important parts
 
-## Development
+- It prefers good captions when they are available.
+- If Whisper is already installed—or you approve it—the skill can use it to double-check parts of the captions.
+- It goes through the whole video in smaller sections, including videos that are over an hour long.
+- It looks for useful diagrams, charts, equations, code, demonstrations, and on-screen text.
+- It keeps timestamps in the speaker notes so you can check each slide against the video.
+- You are responsible for having permission to download and reuse the video.
 
-Run the test suite with:
+## Testing changes to the skill
+
+If you edit the skill, you can check that everything still works by running:
 
 ```bash
 bash tests/run_tests.sh
 ```
 
-The implementation is Mac-optimized and uses a packaged FFmpeg path, avoiding a Homebrew requirement.
+The skill is built for Mac. You do not need Homebrew.
