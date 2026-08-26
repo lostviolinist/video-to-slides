@@ -6,7 +6,7 @@ I made this skill for myself because I want to learn from the many YouTube video
 
 ## What you get
 
-- An editable `.pptx` deck, normally 8–16 slides and never more than 20 automatically
+- A `.pptx` deck on the most important points from the video, that you can edit and customise!
 - A transcript with timestamps
 - The most useful screenshots from the video
 - Speaker notes showing where each slide came from
@@ -58,7 +58,7 @@ Use Paper for the design:
 Turn this video into slides: https://youtu.be/VIDEO_ID --design paper
 ```
 
-### Don't want to download the Whisper model?
+### Don't want to download the Whisper model? (Recommended!!)
 
 That is fine for most YouTube videos with captions. By default, the skill checks the captions and uses them without downloading the large Whisper model.
 
@@ -70,7 +70,7 @@ The setup step adds a small helper for transcription, but it does not download t
 
 ## Want better-looking slides? Paper is optional
 
-Paper is a design app. The skill can use it to try out the colors, fonts, and layouts before making the editable PowerPoint.
+Paper is a design app. The skill can use it to try out the colors, fonts, and layouts before making the editable PowerPoint. Much recommended if you don't want your deck to look like ChatGPT slop :p
 
 Paper connects to Codex using something called MCP. You do not need to understand how it works—just set it up once:
 
