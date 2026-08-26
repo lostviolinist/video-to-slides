@@ -1,5 +1,7 @@
 # video-to-slides
 
+[![skills.sh](https://skills.sh/b/lostviolinist/video-to-slides)](https://skills.sh/lostviolinist/video-to-slides)
+
 Turn any YouTube video into a PowerPoint deck that you can flip through easily and quickly. The skill watches any video, identifies its most important points, and turns it into an informational PPT deck.
 
 I made this skill for myself because I want to learn from the many YouTube videos out there, but I don't have the attention span to listen for an hour straight!
@@ -28,7 +30,7 @@ This is roughly what you can expect. The words, colors, and layout will change t
 Open Terminal and paste this:
 
 ```bash
-git clone https://github.com/lostviolinist/video-to-slides.git ~/.codex/skills/video-to-slides
+npx skills add lostviolinist/video-to-slides --skill video-to-slides -g -a codex -y
 ```
 
 Then restart Codex. Paste this once to finish setting it up:
