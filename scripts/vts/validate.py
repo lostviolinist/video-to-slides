@@ -18,6 +18,7 @@ REQUIRED_FILES = [
 ]
 ALLOWED_ROLES = {"thesis", "claim", "evidence", "example", "caveat", "conclusion"}
 ALLOWED_VISUALS = {"source-frame", "editable-chart", "editable-diagram", "generated", "none"}
+ALLOWED_SLIDE_ROLES = {"title", "introduction", "body", "conclusion"}
 
 
 def validate_project(project: Path) -> dict[str, Any]:
@@ -85,6 +86,9 @@ def validate_project(project: Path) -> dict[str, Any]:
         unknown_cards = set(evidence_ids) - set(card_by_id)
         if unknown_cards:
             errors.append(f"slide {number}: unknown evidence IDs {sorted(unknown_cards)}")
+        slide_role = slide.get("role")
+        if slide_role not in ALLOWED_SLIDE_ROLES:
+            errors.append(f"slide {number}: invalid or missing slide role {slide_role!r}")
         for evidence_id in evidence_ids:
             if evidence_id in card_by_id:
                 used_topics.add(str(card_by_id[evidence_id].get("topic", "")))
@@ -102,6 +106,19 @@ def validate_project(project: Path) -> dict[str, Any]:
                 selected_path = project / selected if selected and not Path(selected).is_absolute() else Path(selected or "")
                 if not selected or not selected_path.is_file():
                     errors.append(f"slide {number}: source frame {frame_id} was not extracted")
+
+    if len(slides) < 3:
+        errors.append("deck must include separate title, introduction, and conclusion slides")
+    else:
+        if slides[0].get("role") != "title":
+            errors.append("first slide must have role 'title'")
+        if slides[1].get("role") != "introduction":
+            errors.append("second slide must have role 'introduction'")
+        if slides[-1].get("role") != "conclusion":
+            errors.append("final slide must have role 'conclusion'")
+        intro_points = slides[1].get("visible_content", [])
+        if not 3 <= len(intro_points) <= 5:
+            warnings.append("introduction should map three to five evidence-backed takeaways")
 
     all_topics = {str(card.get("topic", "")) for card in cards if card.get("topic")}
     missing_topics = sorted(all_topics - used_topics)

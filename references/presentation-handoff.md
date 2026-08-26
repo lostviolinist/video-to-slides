@@ -13,6 +13,13 @@ Use the installed Presentations skill after the evidence pack validates. This re
 - Do not reproduce an on-screen chart as new data unless its labels and values are readable and mapped to evidence. Otherwise use the original frame with attribution.
 - Keep the title slide minimal and do not expose evidence IDs or process language in visible copy.
 
+## Narrative bookends
+
+- Follow the title with a dedicated executive-summary slide. It should state the video's core thesis and three to five takeaways in plain language, giving the audience a useful mental map rather than an agenda or teaser.
+- Make the final slide a conclusion, not merely the last topic covered chronologically. Synthesize the video's answer, most useful implication, and material caveat or next step without adding new claims.
+- Give the introduction and conclusion distinct silhouettes from the body slides so the deck has a clear opening and landing.
+- Keep both restrained. Avoid motivational quotes, dramatic rhetorical questions, hype, generic “why this matters,” thank-you slides, and inspirational slogans.
+
 ## Speaker notes
 
 Every slide needs a `[Sources]` block containing the canonical timestamped video URL or local filename, supporting evidence IDs, transcript segment IDs, and any source-frame IDs.

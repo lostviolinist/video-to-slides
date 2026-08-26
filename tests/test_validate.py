@@ -68,8 +68,18 @@ class ValidateTests(unittest.TestCase):
                 "slides": [
                     {
                         "number": index,
+                        "role": (
+                            "title"
+                            if index == 1
+                            else "introduction"
+                            if index == 2
+                            else "conclusion"
+                            if index == slide_count
+                            else "body"
+                        ),
                         "title": f"Slide {index}",
                         "message": "Supported message",
+                        "visible_content": ["One", "Two", "Three"] if index == 2 else ["Supported point"],
                         "evidence_ids": ["ev-001"],
                         "visual": {
                             "kind": "source-frame" if index == 2 else "none",
@@ -100,6 +110,19 @@ class ValidateTests(unittest.TestCase):
         self.assertFalse(result["ok"])
         self.assertTrue(any("hard cap" in error for error in result["errors"]))
         self.assertTrue(any("unknown evidence" in error for error in result["errors"]))
+
+    def test_missing_narrative_bookends_fail(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            self._make_project(root)
+            briefs = __import__("json").loads((root / "slide_briefs.json").read_text())
+            briefs["slides"][1]["role"] = "body"
+            briefs["slides"][-1]["role"] = "body"
+            write_json(root / "slide_briefs.json", briefs)
+            result = validate_project(root)
+        self.assertFalse(result["ok"])
+        self.assertTrue(any("second slide" in error for error in result["errors"]))
+        self.assertTrue(any("final slide" in error for error in result["errors"]))
 
 
 if __name__ == "__main__":

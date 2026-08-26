@@ -57,6 +57,7 @@ Each component score is an integer from 0–5. Compute `weighted_score` as 35% t
   "slides": [
     {
       "number": 1,
+      "role": "title|introduction|body|conclusion",
       "title": "Answer-first slide title",
       "message": "One main audience-facing message",
       "evidence_ids": ["ev-001"],
@@ -73,3 +74,14 @@ Each component score is an integer from 0–5. Compute `weighted_score` as 35% t
 ```
 
 Every substantive slide must reference at least one evidence card. Title and closing slides may reuse source-level metadata but must still cite the source URL in notes. Source frames must exist in `frames/selected/`. Never invent values to make a chart look complete.
+
+## Required narrative bookends
+
+Use these slide roles and order:
+
+1. `title`: a minimal source-faithful title slide.
+2. `introduction`: a dedicated executive summary of what the video is really saying. State the central thesis and map the three to five ideas the audience should carry through the deck. Ground it in the strongest thesis and conclusion evidence; do not make it an agenda, teaser, motivational quote, hype statement, or generic “why this matters” slide.
+3. `body`: the evidence-backed argument, examples, tools, caveats, or demonstrations.
+4. `conclusion`: a final synthesis that answers the video's main question and gives the audience closure. Distill the overall answer, the most important implication or practical use, and any material caveat. Do not introduce new claims, end on the final chronological topic, or use a generic thank-you or inspirational slogan.
+
+The introduction and conclusion count toward the requested slide total. Visually distinguish both from ordinary body slides so the beginning and ending are clear without turning them into decorative section dividers.
