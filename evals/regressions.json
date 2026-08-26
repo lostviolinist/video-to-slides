@@ -1,0 +1,18 @@
+{
+  "regressions": [
+    {
+      "id": "required-executive-summary-introduction",
+      "criterion": "slides_reflect_the_important_points",
+      "first_seen_in": "visual-explainer-transformers",
+      "failure": "The deck moves directly from its title slide into the first body topic.",
+      "expected": "The first content slide gives a concise, non-corny executive summary of the complete video before the body begins."
+    },
+    {
+      "id": "screenshot-must-visibly-show-claimed-feature",
+      "criterion": "screenshots_match_the_points",
+      "first_seen_in": "long-llm-workflow-tour",
+      "failure": "A screenshot is timestamp-linked and topically related but does not visibly show the feature named by the slide.",
+      "expected": "A retained screenshot clearly shows the object, feature, state, or demonstration claimed by the slide; otherwise use a different frame or an evidence-backed editable diagram."
+    }
+  ]
+}

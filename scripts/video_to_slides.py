@@ -12,6 +12,7 @@ sys.path.insert(0, str(SCRIPT_DIR))
 os.environ["PATH"] = str(Path(sys.executable).resolve().parent) + os.pathsep + os.environ.get("PATH", "")
 
 from vts.models import read_json
+from vts.evaluate import evaluate_and_write
 from vts.pipeline import cleanup_project, extract_selected, prepare_project
 from vts.validate import validate_project
 
@@ -47,6 +48,15 @@ def build_parser() -> argparse.ArgumentParser:
     validate = subparsers.add_parser("validate", help="Validate the evidence pack and slide briefs")
     validate.add_argument("--project", type=Path, required=True)
 
+    evaluate = subparsers.add_parser("eval", help="Evaluate evidence coverage and deck traceability")
+    evaluate.add_argument("--project", type=Path, required=True)
+    evaluate.add_argument("--pptx", type=Path, required=True)
+    evaluate.add_argument(
+        "--report",
+        type=Path,
+        help="Report path; defaults to <project>/eval.json",
+    )
+
     cleanup = subparsers.add_parser("cleanup", help="Remove project-owned temporary media")
     cleanup.add_argument("--project", type=Path, required=True)
     return parser
@@ -80,6 +90,8 @@ def main() -> int:
         result = extract_selected(args.project, frame_ids)
     elif args.command == "validate":
         result = validate_project(args.project)
+    elif args.command == "eval":
+        result = evaluate_and_write(args.project, args.pptx, args.report)
     elif args.command == "cleanup":
         result = cleanup_project(args.project)
     else:

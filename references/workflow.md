@@ -56,6 +56,6 @@ Write an array of selected candidate frame IDs to `selected_frame_ids.json`, the
 
 For YouTube sources, the helper attempts short targeted clips at up to 1080p and falls back to the scouting media. For local sources it extracts directly without modifying the original.
 
-## Validate and clean
+## Validate, evaluate, and clean
 
-Before deck authoring, run `validate`. Run it again after updating slide briefs or selected frames. After the final PPTX has passed presentation rendering and overflow checks, run `cleanup`; it removes only project-owned scout media, rejected candidates, contact sheets, and temporary clips.
+Before deck authoring, run `validate`. Run it again after updating slide briefs or selected frames. After the final PPTX has passed presentation rendering and overflow checks, run `eval`; it saves `eval.json` in the project. Complete the visual review in `evals/rubric.md` and save `semantic_eval.json`. Fix and rerun both checks until they pass, then run `cleanup`; it removes only project-owned scout media, rejected candidates, contact sheets, and temporary clips.

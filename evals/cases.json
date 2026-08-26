@@ -1,0 +1,44 @@
+{
+  "cases": [
+    {
+      "id": "visual-explainer-transformers",
+      "source": "https://youtu.be/wjZofJX0v4M",
+      "options": ["--accuracy", "adaptive"],
+      "tests": [
+        "technical ideas are selected from the complete video",
+        "animation frames match the ideas they explain",
+        "diagrams do not invent transformer relationships",
+        "slide 2 is an executive summary of the complete video, not the first body topic"
+      ]
+    },
+    {
+      "id": "long-llm-workflow-tour",
+      "source": "https://youtu.be/EWvNQjAaOHw",
+      "options": ["--accuracy", "adaptive", "--slides", "auto"],
+      "tests": [
+        "every long-video window is reviewed",
+        "the deck is not disproportionately based on the opening",
+        "the introduction and conclusion synthesize the complete tour",
+        "a screenshot used to explain video input visibly shows the camera or video-input feature"
+      ]
+    },
+    {
+      "id": "captionless-local-tutorial",
+      "source": "fixture:captionless-local-video",
+      "status": "fixture-needed",
+      "tests": [
+        "the skill does not pretend captions exist",
+        "visual UI changes remain aligned with the spoken steps"
+      ]
+    },
+    {
+      "id": "repetitive-podcast",
+      "source": "fixture:long-repetitive-podcast",
+      "status": "fixture-needed",
+      "tests": [
+        "repetition and sponsor sections are excluded",
+        "talking-head frames are not used as decorative filler"
+      ]
+    }
+  ]
+}

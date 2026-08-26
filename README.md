@@ -98,6 +98,15 @@ The skill looks at the video's colors, fonts, diagrams, screenshots, and overall
 - It keeps timestamps in the speaker notes so you can check each slide against the video.
 - You are responsible for having permission to download and reuse the video.
 
+## Every deck gets checked before you receive it
+
+The skill runs two checks at the end of every deck:
+
+- It checks that the whole video was reviewed, the important points made it into the slides, screenshots and diagrams are connected to the right evidence, and every slide has source notes.
+- It looks through the finished slides and checks whether the chosen points, screenshots, and diagrams are actually right and useful.
+
+If either check fails, the skill fixes the deck and runs the checks again before giving it to you. The results are saved with the other project files as `eval.json` and `semantic_eval.json`.
+
 ## Testing changes to the skill
 
 If you edit the skill, you can check that everything still works by running:
@@ -105,5 +114,13 @@ If you edit the skill, you can check that everything still works by running:
 ```bash
 bash tests/run_tests.sh
 ```
+
+To run the same check yourself:
+
+```bash
+python scripts/video_to_slides.py eval --project /path/to/project --pptx /path/to/deck.pptx
+```
+
+The command saves its result as `eval.json`. Then use [the four-part review rubric](evals/rubric.md) for the visual check.
 
 The skill is built for Mac. You do not need Homebrew.

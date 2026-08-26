@@ -12,12 +12,22 @@ All paths are relative to the project directory unless explicitly marked absolut
 - `frames/frame_manifest.json`: every accepted candidate's timestamp, source signal, perceptual hash, sharpness, and selected path when extracted.
 - `visual_dna.json`: source-derived palette, typography, composition, image treatment, prohibited patterns, supporting frame IDs, and design-mode confidence.
 - `paper_handoff.json`: optional Paper artboard, JSX, computed-style, and design-audition mappings used to reconstruct the editable PPTX.
+- `eval.json`: automated final check of transcript coverage, evidence use, visual links, and PowerPoint source notes.
+- `semantic_eval.json`: final visual review scores and short evidence for the four checks in `evals/rubric.md`.
 
 ## `evidence.json`
 
 ```json
 {
   "analysis_mode": "multimodal",
+  "window_reviews": [
+    {
+      "window_id": "win-0001",
+      "decision": "selected|covered|omitted",
+      "evidence_ids": ["ev-001"],
+      "reason": "Required when omitted; otherwise optional"
+    }
+  ],
   "cards": [
     {
       "id": "ev-001",
@@ -43,6 +53,8 @@ All paths are relative to the project directory unless explicitly marked absolut
 }
 ```
 
+`window_reviews` is the audit trail proving that the full transcript was considered. Include exactly one review for every window in `timeline.json`. Use `selected` when the window produced evidence used in the deck, `covered` when its useful content duplicates evidence captured elsewhere, and `omitted` only with a concrete reason such as sponsor material, repetition, silence, or no substantive content.
+
 Each component score is an integer from 0–5. Compute `weighted_score` as 35% thesis relevance, 25% evidence strength, 20% uniqueness, 10% visual value, and 10% structural importance. Penalize sponsor material, repetition, and weakly supported interpretation by lowering the applicable components; do not hide them in the formula.
 
 ## `slide_briefs.json`
@@ -64,6 +76,7 @@ Each component score is an integer from 0–5. Compute `weighted_score` as 35% t
       "visual": {
         "kind": "source-frame|editable-chart|editable-diagram|generated|none",
         "frame_id": "fr-0042",
+        "evidence_ids": ["ev-001"],
         "instruction": "How the visual supports the message"
       },
       "visible_content": ["Short supported point"],
@@ -75,6 +88,8 @@ Each component score is an integer from 0–5. Compute `weighted_score` as 35% t
 
 Every substantive slide must reference at least one evidence card. Title and closing slides may reuse source-level metadata but must still cite the source URL in notes. Source frames must exist in `frames/selected/`. Never invent values to make a chart look complete.
 
+Every source screenshot or editable diagram must list its supporting evidence in `visual.evidence_ids`. Screenshot evidence must contain the same `frame_id`; diagram evidence must support the objects and relationships named in `instruction`. This traceability is required even though semantic correctness still needs visual review.
+
 ## Required narrative bookends
 
 Use these slide roles and order:
@@ -85,3 +100,27 @@ Use these slide roles and order:
 4. `conclusion`: a final synthesis that answers the video's main question and gives the audience closure. Distill the overall answer, the most important implication or practical use, and any material caveat. Do not introduce new claims, end on the final chronological topic, or use a generic thank-you or inspirational slogan.
 
 The introduction and conclusion count toward the requested slide total. Visually distinguish both from ordinary body slides so the beginning and ending are clear without turning them into decorative section dividers.
+
+## Final eval files
+
+Run the automated eval after the final PPTX exists. It writes `eval.json` automatically. Then inspect the evidence and every rendered slide using `evals/rubric.md` and save `semantic_eval.json` with the four scores, the evidence behind each score, the overall pass result, and any regression found. Do not mark the deck complete when either file records a failure.
+
+```json
+{
+  "scores": {
+    "full_transcript_review": 4,
+    "important_points": 4,
+    "screenshots": 3,
+    "diagrams": 4
+  },
+  "findings": {
+    "full_transcript_review": "Short evidence for the score",
+    "important_points": "Short evidence for the score",
+    "screenshots": "Short evidence for the score",
+    "diagrams": "Short evidence for the score"
+  },
+  "critical_errors": [],
+  "passed": true,
+  "regressions": []
+}
+```
